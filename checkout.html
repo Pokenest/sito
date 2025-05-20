@@ -142,12 +142,55 @@
       }
     }
   </style>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    (function(){
-      emailjs.init("ZWwRHbOZLQ8rHcW7F");
-    })();
-  </script>
+<script type="module">
+  import emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+
+  emailjs.init('ZWwRHbOZLQ8rHcW7F');
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('checkout-form');
+    const nomeInput = document.getElementById('nome');
+    const emailInput = document.getElementById('email');
+    const paypalBtn = document.getElementById('paypal-btn');
+
+    // Totale ordine da localStorage
+    const totale = localStorage.getItem("totale-carrello");
+    if (totale) {
+      document.getElementById("totale-ricordato").innerText = "Totale ordine: " + totale + " €";
+    }
+
+    // Attiva/disattiva pulsante
+    function checkFields() {
+      if (nomeInput.value.trim() !== '' && emailInput.value.trim() !== '' && emailInput.checkValidity()) {
+        paypalBtn.disabled = false;
+      } else {
+        paypalBtn.disabled = true;
+      }
+    }
+
+    nomeInput.addEventListener('input', checkFields);
+    emailInput.addEventListener('input', checkFields);
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const nome = nomeInput.value.trim();
+      const email = emailInput.value.trim();
+
+      emailjs.send('service_pokenest1', 'template_6wac0a8', {
+        user_name: nome,
+        user_email: email,
+        order_total: totale
+      }).then(() => {
+        alert("Email di conferma inviata con successo!");
+        window.location.href = 'https://www.paypal.com/paypalme/pokenestonline';
+      }, (error) => {
+        alert("Errore nell'invio dell'email: " + error.text);
+      });
+    });
+  });
+</script>
+
 </head>
 <body>
   <header>
